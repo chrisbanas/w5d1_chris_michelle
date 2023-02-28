@@ -1,5 +1,11 @@
 class Integer
   # Integer#hash already implemented for you
+  new = Hash.new { |h,k| h[k] = self.index }
+
+  if self.is_a?(Integer)
+
+  end
+
 end
 
 class Array
@@ -9,7 +15,7 @@ end
 
 class String
   def hash
-  end
+  endb
 end
 
 class Hash
