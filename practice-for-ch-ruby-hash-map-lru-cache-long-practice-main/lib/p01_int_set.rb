@@ -1,3 +1,5 @@
+require "byebug"
+
 class MaxIntSet
   attr_reader :store
 
@@ -46,7 +48,7 @@ class IntSet
   end
 
   def remove(num)
-    @store.delete_at(num)
+    self[num].delete(num)
   end
 
   def include?(num)
@@ -73,14 +75,21 @@ class ResizingIntSet
   end
 
   def insert(num)
-    if !@store.include?(num)
+    if !self.include?(num)
       self[num] << num
       @count += 1
     end
 
+    if count > self.num_buckets
+      self.resize!
+    end
   end
 
   def remove(num)
+    if self.include?(num)
+      self[num].delete(num)
+      @count -= 1
+    end
   end
 
   def include?(num)
@@ -91,23 +100,30 @@ class ResizingIntSet
   #   # @count += 1
   # end
 
-  private
+  # private
 
   def num_buckets
     @store.length
   end
 
   def resize!
-    copy = @store.dup
+    copy = @store.dup.flatten
+    prev_num_buckets = @store.length
 
-    @store = Array.new(num_buckets * 2)
-    copy.each_with_index do |prev_ele , i|
-      @store[prev_ele] = prev_ele
-    end
+    # if count > self.num_buckets
+      @store = Array.new(2 * prev_num_buckets) { Array.new }
+      copy.each do |prev_ele|
+        self[prev_ele] << prev_ele
+        # don't have a []= method, so we need to shovel into
+      end
+    # end
 
   end
 
   def [](num)
-    @store[num % (num_buckets + count)]
+    @store[num % (num_buckets)]
   end
 end
+
+
+# difference between delete and delete_at
